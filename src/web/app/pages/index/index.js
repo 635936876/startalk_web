@@ -53,6 +53,66 @@ export default class Page extends Component {
       }
     });
   }
+  
+  // 把平级数组转化为树状结构
+  createTree(data) {
+    // 控制每个人的可视数据
+    const visible = [];
+    data.forEach((item) => {
+      if (item.visibleFlag === true) {
+        visible.push(item);
+      }
+    });
+    const treeArray = [];
+    visible.forEach((item) => {
+      const d = item.D;
+      let floor = [];
+      floor = d.split('/').slice(1);
+      let nowArray = treeArray;
+      for (let i = 0; i < floor.length; i++) {
+        const index = this.checkIfExist(nowArray, floor[i]);
+        const vote = {};
+        vote.N = item.N;
+        vote.U = item.U;
+        vote.S = item.S;
+        if (index !== false && i !== floor.length - 1) {
+          nowArray = nowArray[index].SD;
+        } else if (index !== false && i === floor.length - 1) {
+          nowArray[index].UL.push(vote);
+        } else if (index === false && i === floor.length - 1) {
+          nowArray.push({
+            D: floor[i],
+            UL: [vote],
+            SD: []
+          });
+        } else {
+          nowArray.push({
+            D: floor[i],
+            UL: [],
+            SD: []
+          });
+          nowArray = nowArray[nowArray.length - 1].SD;
+        }
+      }
+    });
+    return treeArray;
+  }
+
+  // 判断当前数组中有没有传进去的name的这个部门
+  checkIfExist(array = [], name = '') {
+    let flag = false;
+    if (array.length === 0) {
+      flag = false;
+    } else {
+      for (let i = 0; i < array.length; i++) {
+        if (array[i].D === name) {
+          flag = i;
+          break;
+        }
+      }
+    }
+    return flag;
+  }
 
   genTreeData(data, id) {
     const ret = [];
