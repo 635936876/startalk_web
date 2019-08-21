@@ -21,7 +21,7 @@
     如： BASEURL=http://127.0.0.1:8080
   - 执行 npm run build , 新开 tab 页执行 npm run dev 启动项目
 
-  ### 项目打包上线
+  #### 项目打包上线
   - 修改 .env 文件为 NODE_ENV=production
   - profiles/development/startalk.env 配置线上环境后台地址，
     如： BASEURL=http://127.0.0.1:8080
@@ -41,3 +41,7 @@
   - 比如lodash
   - import omit from 'lodash/omit' //best
   - import { omit } from 'lodash'  //bad
+
+  #### 2.获取直属领导，员工编号和查询用户电话功能
+  - 两个功能的逻辑已写好
+  - 接口需使用者自己实现,位置位于entry.js

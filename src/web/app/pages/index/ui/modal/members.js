@@ -485,7 +485,7 @@ export default class Members extends Component {
         </div>
         <div className="members-right">
           <div className="header">已有联系人(共{selected.length}人)</div>
-          
+          {this.renderList()}
           <div className="footer">
             <div className="btn cancel" onClick={() => this.onClose()}>
               取消
