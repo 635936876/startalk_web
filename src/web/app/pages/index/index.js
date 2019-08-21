@@ -38,11 +38,6 @@ Notification.requestPermission();//用户是否同意显示通知
 export default class Page extends Component {
   constructor(props) {
     super(props)
-
-    // this.getStartalkNav()
-    // this.state = {
-    //   flag: false
-    // }
   }
 
   componentDidMount() {
@@ -59,108 +54,6 @@ export default class Page extends Component {
     });
   }
 
-  async getStartalkNav() {
-    const { setStartalkNav, setPublicKey } = this.props
-    const req = await axios({
-      method: 'get',
-      url: '/startalk_nav',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const { data } = req;
-
-    setStartalkNav(data);
-
-    const publicKeyReq = await this.getPublicKey(data.baseaddess.javaurl)
-    const { data: publicKeyData } = publicKeyReq
-    if (publicKeyData.ret) {
-      initSdk(data, publicKeyData.data.pub_key_fullkey)
-        .then(sdk => {
-          this.setState({ flag: true })
-          sdk.ready(async () => {
-            const res = await sdk.getCompanyStruct();
-            if (res.ret) {
-              const treeData = this.createTree(res.data);
-              // res.data 处理成jstree结构
-              this.props.setChatField({
-                companyStruct: this.genTreeData(treeData || [], treeKey),
-                companyUsers: users
-              });
-            }
-          });
-        })
-
-      setPublicKey(publicKeyData.data)
-    } else {
-      alert(publicKeyData.errmsg)
-    }
-  }
-
-  getPublicKey() {
-    return axios({
-      method: 'get',
-      url: '/package/qtapi/nck/rsa/get_public_key.do',
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-  // 把平级数组转化为树状结构
-  createTree(data) {
-    // 控制每个人的可视数据
-    const visible = [];
-    data.forEach((item) => {
-      if (item.visibleFlag === true) {
-        visible.push(item);
-      }
-    });
-    const treeArray = [];
-    visible.forEach((item) => {
-      const d = item.D;
-      let floor = [];
-      floor = d.split('/').slice(1);
-      let nowArray = treeArray;
-      for (let i = 0; i < floor.length; i++) {
-        const index = this.checkIfExist(nowArray, floor[i]);
-        const vote = {};
-        vote.N = item.N;
-        vote.U = item.U;
-        vote.S = item.S;
-        if (index !== false && i !== floor.length - 1) {
-          nowArray = nowArray[index].SD;
-        } else if (index !== false && i === floor.length - 1) {
-          nowArray[index].UL.push(vote);
-        } else if (index === false && i === floor.length - 1) {
-          nowArray.push({
-            D: floor[i],
-            UL: [vote],
-            SD: []
-          });
-        } else {
-          nowArray.push({
-            D: floor[i],
-            UL: [],
-            SD: []
-          });
-          nowArray = nowArray[nowArray.length - 1].SD;
-        }
-      }
-    });
-    return treeArray;
-  }
-
-  // 判断当前数组中有没有传进去的name的这个部门
-  checkIfExist(array = [], name = '') {
-    let flag = false;
-    if (array.length === 0) {
-      flag = false;
-    } else {
-      for (let i = 0; i < array.length; i++) {
-        if (array[i].D === name) {
-          flag = i;
-          break;
-        }
-      }
-    }
-    return flag;
-  }
   genTreeData(data, id) {
     const ret = [];
     data.length && data.forEach((item, idx) => {
