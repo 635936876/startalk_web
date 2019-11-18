@@ -95,8 +95,12 @@ global.startalkKeys = {};
     (0, _request2.default)(`${global.startalkNavConfig.baseaddess.javaurl}/qtapi/nck/rsa/get_public_key.do`, (error, response, body) => {
       if (!error && response.statusCode == 200) {
         global.startalkKeys = JSON.parse(body).data;
+      } else {
+        console.log('没有获取到公钥!');
       }
     });
+  } else {
+    console.log('没有获取到后台接口!');
   }
 });
 app.use((0, _koaCompress2.default)({
